@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+<meta charset="UTF-8">
+<title>Music System</title>
+<style>
+body {
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background-size:cover;
+    background-position:center;
+    font-family:Arial;
+    overflow:hidden;
+}
+
+.blur {
+    position:absolute;
+    width:100%;
+    height:100%;
+    backdrop-filter: blur(40px);
+    z-index:0;
+}
+
+.player {
+    position:relative;
+    text-align:center;
+    z-index:2;
+}
+
+.record {
+    width:260px;
+    height:260px;
+    border-radius:50%;
+    background:black;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    animation:spin 6s linear infinite;
+    animation-play-state: paused;
+}
+
+.record img {
+    width:110px;
+    height:110px;
+    border-radius:50%;
+}
+
+.play {
+    position:absolute;
+    width:60px;
+    height:60px;
+    background:rgba(255,255,255,0.3);
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    cursor:pointer;
+}
+
+.play::after {
+    content:"▶️";
+    color:white;
+}
+
+.title {
+    margin-top:20px;
+    color:white;
+    font-size:20px;
+}
+
+@keyframes spin {
+    from {transform: rotate(0);}
+    to {transform: rotate(360deg);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="blur"></div>
+
+<div class="player">
+    <div class="record" id="record">
+        <img id="cover">
+    </div>
+
+    <div class="play" onclick="playMusic()"></div>
+
+    <div class="title" id="title"></div>
+</div>
+
+<audio id="audio"></audio>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+
+const img = params.get("img");
+const audioSrc = params.get("audio");
+const text = params.get("text");
+
+document.body.style.backgroundImage = ⁠ url(${img}) ⁠;
+document.getElementById("cover").src = img;
+document.getElementById("audio").src = audioSrc;
+document.getElementById("title").innerText = text;
+
+function playMusic(){
+    document.getElementById("audio").play();
+    document.getElementById("record").style.animationPlayState = "running";
+}
+</script>
+
+</body>
+</html>
