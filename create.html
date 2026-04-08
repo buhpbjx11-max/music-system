@@ -1,69 +1,167 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="he" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<title>יצירת שיר 🎧</title>
-<style>
-body {
-    font-family: Arial;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    flex-direction:column;
-    background:#111;
-    color:white;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>צור תקליט</title>
+  <style>
+    * { box-sizing: border-box; }
 
-input {
-    margin:10px;
-    padding:12px;
-    width:280px;
-    border:none;
-    border-radius:8px;
-}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
 
-button {
-    padding:12px 20px;
-    border:none;
-    border-radius:10px;
-    background:#00c3ff;
-    color:white;
-    cursor:pointer;
-    font-size:16px;
-}
+    .wrap {
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
 
-.result {
-    margin-top:20px;
-    word-break:break-all;
-    text-align:center;
-}
-</style>
+    h1 {
+      font-size: 28px;
+      margin: 0 0 24px;
+    }
+
+    input, textarea {
+      width: 100%;
+      margin: 10px 0;
+      padding: 14px 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .main-btn {
+      background: #10bfff;
+      color: white;
+      width: 100%;
+      font-weight: bold;
+    }
+
+    .copy-btn {
+      background: #222;
+      color: white;
+      width: 100%;
+    }
+
+    .result {
+      margin-top: 18px;
+      display: none;
+    }
+
+    .note {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #bbb;
+      line-height: 1.5;
+    }
+
+    .success {
+      margin-top: 10px;
+      color: #7dff9b;
+      font-size: 14px;
+      min-height: 20px;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="wrap">
+    <h1>🎧 צור תקליט</h1>
 
-<h2>🎧 צור תקליט</h2>
+    <input id="img" type="text" placeholder="הדבקי קישור לתמונה" />
+    <input id="audio" type="text" placeholder="הדבקי קישור לשיר" />
+    <input id="text" type="text" placeholder="שם השיר" />
 
-<input type="text" id="img" placeholder="הדבק קישור לתמונה">
-<input type="text" id="audio" placeholder="הדבק קישור לשיר (mp3)">
-<input type="text" id="text" placeholder="שם השיר">
+    <button class="main-btn" onclick="createLink()">צור לינק</button>
 
-<button onclick="create()">צור לינק</button>
+    <div class="result" id="resultBox">
+      <textarea id="resultLink" rows="5" readonly placeholder="כאן יופיע הקישור"></textarea>
+      <button class="copy-btn" onclick="copyLink()">העתק לינק</button>
+      <div class="success" id="successMsg"></div>
+    </div>
 
-<div class="result" id="result"></div>
+    <div class="note">
+      אפשר להדביק גם קישור רגיל של Google Drive — המערכת תנסה להמיר אותו לבד.
+    </div>
+  </div>
 
-<script>
-function create(){
-    const img = document.getElementById("img").value;
-    const audio = document.getElementById("audio").value;
-    const text = document.getElementById("text").value;
+  <script>
+    function convertDriveLink(url) {
+      if (!url) return "";
 
-    const link = ⁠ https://buhpbjx11-max.github.io/music-system/?img=${encodeURIComponent(img)}&audio=${encodeURIComponent(audio)}&text=${encodeURIComponent(text)} ⁠;
+      url = url.trim();
 
-    document.getElementById("result").innerHTML = ⁠ <a href="${link}" target="_blank">${link}</a> ⁠;
-}
-</script>
+      if (url.includes("drive.google.com/file/d/")) {
+        const match = url.match(/\/file\/d\/([^\/]+)\//);
+        if (match && match[1]) {
+          return "https://drive.google.com/uc?export=download&id=" + match[1];
+        }
+      }
 
+      if (url.includes("drive.google.com/open?id=")) {
+        const match = url.match(/[?&]id=([^&]+)/);
+        if (match && match[1]) {
+          return "https://drive.google.com/uc?export=download&id=" + match[1];
+        }
+      }
+
+      if (url.includes("drive.google.com/uc?")) {
+        return url;
+      }
+
+      return url;
+    }
+
+    function createLink() {
+      const imgInput = document.getElementById("img").value;
+      const audioInput = document.getElementById("audio").value;
+      const textInput = document.getElementById("text").value.trim();
+
+      const img = convertDriveLink(imgInput);
+      const audio = convertDriveLink(audioInput);
+      const text = textInput;
+
+      if (!img || !audio || !text) {
+        alert("מלאי תמונה, שיר ושם שיר");
+        return;
+      }
+
+      const finalLink =
+        "https://buhpbjx11-max.github.io/music-system/" +
+        "?img=" + encodeURIComponent(img) +
+        "&audio=" + encodeURIComponent(audio) +
+        "&text=" + encodeURIComponent(text);
+
+      document.getElementById("resultLink").value = finalLink;
+      document.getElementById("resultBox").style.display = "block";
+      document.getElementById("successMsg").innerText = "הלינק נוצר בהצלחה";
+    }
+
+    function copyLink() {
+      const field = document.getElementById("resultLink");
+      field.select();
+      field.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      document.getElementById("successMsg").innerText = "הלינק הועתק";
+    }
+  </script>
 </body>
 </html>
